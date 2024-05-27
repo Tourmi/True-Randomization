@@ -15,10 +15,10 @@ Requirements:
 
 Steps:
 * clone the repo
-* run `python.exe -m pip install -r requirements.txt`
+* run `python -m pip install -r requirements.txt`
 * download the latest release
 * checkout the commit that matches the version of the downloaded release
 * Unzip the contents of the release to the `dist/` folder (create it if missing)
   * The `dist/` folder should at the very least contain the `Tools/`, `MapEdit/`, and `Data/` folders from the release
-* run `pyinstaller.exe --onefile --add-data "Bloodstained.ico;." --icon=Bloodstained.ico Randomizer.py`
+* run `pyinstaller --onefile --add-data "Bloodstained.ico;." --icon=Bloodstained.ico BloodstainedRandomizer.py`
 * optional: view the [UAssetSnippet project](SnippetSrc/README.md) to setup UAssetAPI and UAssetSnippet code snippets
