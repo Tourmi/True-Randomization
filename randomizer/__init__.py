@@ -2,9 +2,10 @@ from .DLCType import DLCType
 from .FileType import FileType
 from .Data import Data
 from .Equipment import Equipment
-from .Graphic import Graphic
-from .Library import Library
 from .Room import Room
+from .Library import Library
 from .Shard import Shard
 from .Shop import Shop
 from .Sound import Sound
+from .Enemy import Enemy
+from .Graphic import Graphic

@@ -3,10 +3,10 @@ from enum import Enum
 
 from .GlobalImports import *
 from .Constants import *
+from . import Enemy
 from . import Data
 from . import Utility
 from . import Shop
-from . import Enemy
 from . import Room
 
 _IMPORTANT_CHECK_RATIO = 2
@@ -1670,7 +1670,7 @@ def create_log(seed, map):
     log["Beatable"] = final_boss_available()
     return log
 
-def create_log_string(seed : str, map : str):
+def create_log_string(seed : str, map : str, original_enemies):
     #Log string for quickly showing answer to a seed
     file_name = os.path.split(os.path.splitext(map)[0])[-1]
     map_name = file_name if file_name else "Default"
@@ -1683,8 +1683,8 @@ def create_log_string(seed : str, map : str):
             log_string += "  " + Data.translation["Item"][item] + ": " + key_item_to_location[item]
         if item in _KEY_SHARDS:
             log_string += "  " + Data.translation["Shard"][item] + ": " + Data.translation["Enemy"][key_shard_to_location[item]]
-            if key_shard_to_location[item] in Enemy.enemy_replacement_invert:
-                log_string += " (over " + Data.translation["Enemy"][Enemy.enemy_replacement_invert[key_shard_to_location[item]]] + ")"
+            if key_shard_to_location[item] in original_enemies:
+                log_string += " (over " + Data.translation["Enemy"][original_enemies[key_shard_to_location[item]]] + ")"
         log_string += "\n"
     log_string += "Beatable: "
     log_string += "Yes" if final_boss_available() else "No"

@@ -13,6 +13,9 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
+from randomizer import DLCType
+from randomizer.Data import *
+from randomizer.Constants import *
 from randomizer import Bloodless
 from randomizer import Enemy
 from randomizer import Item
@@ -22,9 +25,6 @@ from randomizer import Utility
 
 from configuration import Config
 from configuration import ConfigSections
-from randomizer.Data import *
-from randomizer.Constants import *
-from randomizer import DLCType
 from .Generate import Generate
 from .Import import Import
 from .Update import Update
@@ -1512,7 +1512,7 @@ class MainWindow(QGraphicsView):
         if self.config.getboolean(ConfigSections.extra.bloodless_candles):
             box.setText(Bloodless.create_log_string(self.selected_seed, self.selected_map))
         elif self.config.getboolean(ConfigSections.item.overworld_pool):
-            box.setText(Item.create_log_string(self.selected_seed, self.selected_map))
+            box.setText(Item.create_log_string(self.selected_seed, self.selected_map, Enemy.enemy_replacement_invert))
         else:
             box.setText("No keys to randomize")
         box.exec()

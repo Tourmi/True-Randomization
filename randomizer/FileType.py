@@ -1,6 +1,6 @@
-import enum
+from enum import Enum
 
-class FileType(enum.Enum):
+class FileType(Enum):
     DataTable   = 0
     StringTable = 1
     Blueprint   = 2

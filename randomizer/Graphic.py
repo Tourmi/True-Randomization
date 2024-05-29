@@ -4,8 +4,8 @@ import colorsys
 from .GlobalImports import *
 from .Constants import *
 from .Data import *
-from . import FileType
 from . import Enemy
+from . import FileType
 
 type HSV = tuple[float, float, float]
 

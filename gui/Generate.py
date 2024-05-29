@@ -6,11 +6,11 @@ from randomizer import Shard
 from randomizer import Equipment
 from randomizer import Enemy
 from randomizer import Room
-from randomizer import Graphic
 from randomizer import Sound
 from randomizer import Bloodless
-from randomizer.DLCType import DLCType
+from randomizer import Graphic
 
+from randomizer.DLCType import DLCType
 from randomizer.Constants import MOD_DIR
 from randomizer.Data import Data
 from configuration import Config
