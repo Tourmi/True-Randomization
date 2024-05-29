@@ -5,13 +5,11 @@ import subprocess
 import traceback
 import zipfile
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import QThread
 
-from Constants import *
+from randomizer.Constants import SCRIPT_NAME
 from configuration import Config
-from . import Signaller
+from .Signaller import Signaller
 
 class Update(QThread):
     def __init__(self, config : Config, progress_bar, api):

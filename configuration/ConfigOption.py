@@ -1,13 +1,9 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 
 T = TypeVar('T')
 
 class ConfigOption(Generic[T]):
-    section_name : str
-    option_key : str
-    default_value : T
-
-    def __init__(self, section_name : str, option_key : str, default_value : T = None):
+    def __init__(self, section_name : str, option_key : str, default_value : Optional[T] = None):
         self.section_name = section_name
         self.option_key = option_key
         self.default_value = default_value

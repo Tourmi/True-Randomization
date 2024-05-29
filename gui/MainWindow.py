@@ -13,26 +13,27 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-import Bloodless
-import Enemy
-import Item
-import Manager
-import Room
-import Utility
+from randomizer import Bloodless
+from randomizer import Enemy
+from randomizer import Item
+from randomizer import Manager
+from randomizer import Room
+from randomizer import Utility
 
 from configuration import Config
 from configuration import ConfigSections
-from Constants import *
-from DLCType import DLCType
+from randomizer.Data import *
+from randomizer.Constants import *
+from randomizer import DLCType
 from .Generate import Generate
 from .Import import Import
 from .Update import Update
 from .widgets import ModifiedFilesWidget
 
 def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
+    if hasattr(sys, '_MEIPASS'):
+        base_path = getattr(sys, '_MEIPASS')
+    else:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
@@ -112,7 +113,7 @@ class MainWindow(QGraphicsView):
         #Main layout
         
         main_window_layout = QHBoxLayout()
-        main_window_layout.setSpacing(self.size_multiplier*10)
+        main_window_layout.setSpacing(int(self.size_multiplier*10))
         self.setLayout(main_window_layout)
 
         #Left Label
@@ -121,13 +122,13 @@ class MainWindow(QGraphicsView):
         artwork_label.setStyleSheet("border: 1px solid white")
         artwork_label.setPixmap(QPixmap("Data\\artwork.png"))
         artwork_label.setScaledContents(True)
-        artwork_label.setFixedSize(self.size_multiplier*550, self.size_multiplier*978)
+        artwork_label.setFixedSize(int(self.size_multiplier*550), int(self.size_multiplier*978))
         main_window_layout.addWidget(artwork_label)
         
         #Center widget
         
         center_widget_layout = QGridLayout()
-        center_widget_layout.setSpacing(self.size_multiplier*10)
+        center_widget_layout.setSpacing(int(self.size_multiplier*10))
         main_window_layout.addLayout(center_widget_layout)
         
         #Groupboxes
@@ -214,7 +215,7 @@ class MainWindow(QGraphicsView):
         
         #Right panel
         right_groupbox = QGroupBox()
-        right_groupbox.setFixedSize(self.size_multiplier*550, self.size_multiplier*978)
+        right_groupbox.setFixedSize(int(self.size_multiplier*550), int(self.size_multiplier*978))
         main_window_layout.addWidget(right_groupbox)
         right_groupbox_layout = QVBoxLayout()
         right_groupbox.setLayout(right_groupbox_layout)
@@ -229,7 +230,7 @@ class MainWindow(QGraphicsView):
         discord_label = QLabel()
         discord_label.setStyleSheet("border: 2px solid transparent")
         discord_label.setText("<a href=\"https://discord.gg/nUbFA7MEeU\"><font face=Cambria color=#0080ff>Discord</font></a>")
-        discord_label.setAlignment(Qt.AlignRight)
+        discord_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         discord_label.setOpenExternalLinks(True)
         right_groupbox_layout_bottom.addStretch(1)
         right_groupbox_layout_bottom.addWidget(discord_label)
@@ -385,7 +386,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_1.setAccessibleName("spin_button_1")
         self.spin_button_1.setToolTip("Logic complexity. Higher values usually follow a\nprogression chain.")
         self.spin_button_1.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_1.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_1.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_1.clicked.connect(self.spin_button_1_clicked)
         self.spin_button_1.setVisible(False)
         center_box_1_layout.addWidget(self.spin_button_1, 0, 1)
@@ -395,7 +396,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_2.setAccessibleName("spin_button_2")
         self.spin_button_2.setToolTip("Weight of shop items locked behind events.")
         self.spin_button_2.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_2.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_2.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_2.clicked.connect(self.spin_button_2_clicked)
         self.spin_button_2.setVisible(False)
         center_box_1_layout.addWidget(self.spin_button_2, 2, 1)
@@ -405,7 +406,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_3.setAccessibleName("spin_button_3")
         self.spin_button_3.setToolTip("Price weight. The higher the value the more extreme\nthe price differences.")
         self.spin_button_3.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_3.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_3.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_3.clicked.connect(self.spin_button_3_clicked)
         self.spin_button_3.setVisible(False)
         center_box_2_layout.addWidget(self.spin_button_3, 0, 1)
@@ -415,7 +416,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_4.setAccessibleName("spin_button_4")
         self.spin_button_4.setToolTip("Requirement weight. 2 is linear, 1 and 3 favor early and\nlate map completion respectively.")
         self.spin_button_4.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_4.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_4.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_4.clicked.connect(self.spin_button_4_clicked)
         self.spin_button_4.setVisible(False)
         center_box_3_layout.addWidget(self.spin_button_4, 0, 1)
@@ -425,7 +426,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_5.setAccessibleName("spin_button_5")
         self.spin_button_5.setToolTip("Power weight. The higher the value the more extreme\nthe power differences.")
         self.spin_button_5.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_5.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_5.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_5.clicked.connect(self.spin_button_5_clicked)
         self.spin_button_5.setVisible(False)
         center_box_4_layout.addWidget(self.spin_button_5, 0, 1)
@@ -435,7 +436,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_6.setAccessibleName("spin_button_6")
         self.spin_button_6.setToolTip("Stat weight. The higher the value the more extreme\nthe stat differences.")
         self.spin_button_6.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_6.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_6.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_6.clicked.connect(self.spin_button_6_clicked)
         self.spin_button_6.setVisible(False)
         center_box_5_layout.addWidget(self.spin_button_6, 0, 1)
@@ -445,7 +446,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_8.setAccessibleName("spin_button_8")
         self.spin_button_8.setToolTip("Level weight. The higher the value the more extreme\nthe level differences.")
         self.spin_button_8.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_8.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_8.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_8.clicked.connect(self.spin_button_8_clicked)
         self.spin_button_8.setVisible(False)
         center_box_6_layout.addWidget(self.spin_button_8, 1, 1)
@@ -455,7 +456,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_9.setAccessibleName("spin_button_9")
         self.spin_button_9.setToolTip("Level weight. The higher the value the more extreme\nthe level differences.")
         self.spin_button_9.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_9.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_9.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_9.clicked.connect(self.spin_button_9_clicked)
         self.spin_button_9.setVisible(False)
         center_box_6_layout.addWidget(self.spin_button_9, 2, 1)
@@ -465,7 +466,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_10.setAccessibleName("spin_button_10")
         self.spin_button_10.setToolTip("Tolerance weight. The higher the value the more extreme\nthe tolerance differences.")
         self.spin_button_10.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_10.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_10.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_10.clicked.connect(self.spin_button_10_clicked)
         self.spin_button_10.setVisible(False)
         center_box_6_layout.addWidget(self.spin_button_10, 3, 1)
@@ -475,7 +476,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_11.setAccessibleName("spin_button_11")
         self.spin_button_11.setToolTip("Tolerance weight. The higher the value the more extreme\nthe tolerance differences.")
         self.spin_button_11.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_11.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_11.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_11.clicked.connect(self.spin_button_11_clicked)
         self.spin_button_11.setVisible(False)
         center_box_6_layout.addWidget(self.spin_button_11, 4, 1)
@@ -483,7 +484,7 @@ class MainWindow(QGraphicsView):
         
         self.browse_map_button = QPushButton()
         self.browse_map_button.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.browse_map_button.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.browse_map_button.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.browse_map_button.clicked.connect(self.browse_map_button_clicked)
         self.browse_map_button.setVisible(False)
         center_box_7_layout.addWidget(self.browse_map_button, 0, 1)
@@ -492,7 +493,7 @@ class MainWindow(QGraphicsView):
         self.outfit_config_button.setIcon(QPixmap("Data\\config.png"))
         self.outfit_config_button.setToolTip("Configure which outfit colors can be chosen.")
         self.outfit_config_button.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.outfit_config_button.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.outfit_config_button.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.outfit_config_button.clicked.connect(self.outfit_config_button_clicked)
         self.outfit_config_button.setVisible(False)
         center_box_8_layout.addWidget(self.outfit_config_button, 0, 1)
@@ -502,7 +503,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_12.setAccessibleName("spin_button_12")
         self.spin_button_12.setToolTip("Voice language")
         self.spin_button_12.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_12.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_12.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_12.clicked.connect(self.spin_button_12_clicked)
         self.spin_button_12.setVisible(False)
         center_box_9_layout.addWidget(self.spin_button_12, 0, 1)
@@ -512,7 +513,7 @@ class MainWindow(QGraphicsView):
         self.spin_button_13.setAccessibleName("spin_button_13")
         self.spin_button_13.setToolTip("Logic complexity. Higher values usually follow a\nprogression chain.")
         self.spin_button_13.setStyleSheet("QPushButton{color: #ffffff; font-family: Impact}" + "QToolTip{color: #ffffff; font-family: Cambria}")
-        self.spin_button_13.setFixedSize(self.size_multiplier*28, self.size_multiplier*24)
+        self.spin_button_13.setFixedSize(int(self.size_multiplier*28), int(self.size_multiplier*24))
         self.spin_button_13.clicked.connect(self.spin_button_13_clicked)
         self.spin_button_13.setVisible(False)
         center_box_10_layout.addWidget(self.spin_button_13, 0, 1)
@@ -603,7 +604,7 @@ class MainWindow(QGraphicsView):
         
         self.seed_field = QLineEdit(self.config.get(ConfigSections.misc.seed))
         self.seed_field.setMaxLength(30)
-        self.seed_field.textChanged[str].connect(self.seed_field_changed)
+        self.seed_field.textChanged.connect(self.seed_field_changed)
         seed_window_top.addWidget(self.seed_field)
         
         seed_new_button = QPushButton("New Seed")
@@ -643,7 +644,7 @@ class MainWindow(QGraphicsView):
         outfit_window_center.addWidget(miriam_outfit_box)
         
         self.miriam_outfit_list = QListWidget()
-        self.miriam_outfit_list.setSelectionMode(QListWidget.MultiSelection)
+        self.miriam_outfit_list.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
         miriam_outfit_box_layout.addWidget(self.miriam_outfit_list)
         for folder in os.listdir("Data\\Texture\\Miriam"):
             if os.path.isdir(f"Data\\Texture\\Miriam\\{folder}"):
@@ -655,7 +656,7 @@ class MainWindow(QGraphicsView):
         outfit_window_center.addWidget(zangetsu_outfit_box)
         
         self.zangetsu_outfit_list = QListWidget()
-        self.zangetsu_outfit_list.setSelectionMode(QListWidget.MultiSelection)
+        self.zangetsu_outfit_list.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
         zangetsu_outfit_box_layout.addWidget(self.zangetsu_outfit_list)
         for folder in os.listdir("Data\\Texture\\Zangetsu"):
             if os.path.isdir(f"Data\\Texture\\Zangetsu\\{folder}"):
@@ -670,19 +671,19 @@ class MainWindow(QGraphicsView):
         
         self.starting_items_field = QLineEdit(self.config.get(ConfigSections.start_with.items))
         self.starting_items_field.setToolTip("Items to start with. Input their english names with\ncommas as separators. If unsure refer to the files\nin Data\\Translation for item names.")
-        self.starting_items_field.textChanged[str].connect(self.starting_items_field_changed)
+        self.starting_items_field.textChanged.connect(self.starting_items_field_changed)
         center_box_16_layout.addWidget(self.starting_items_field, 0, 0)
         
         self.param_string_format = "{:0" + str(main_param_length + sub_param_length) + "x}"
         self.param_string_field = QLineEdit(self.param_string_format.format(0).upper())
         self.param_string_field.setMaxLength(main_param_length + sub_param_length)
         self.param_string_field.setToolTip("Simplified string containing all the randomization settings.")
-        self.param_string_field.textChanged[str].connect(self.param_string_field_changed)
+        self.param_string_field.textChanged.connect(self.param_string_field_changed)
         center_box_13_layout.addWidget(self.param_string_field, 0, 0)
         
         self.game_path_field = QLineEdit(self.config.get(ConfigSections.misc.game_path))
         self.game_path_field.setToolTip("Path to your game's data (...\\steamapps\\common\\Bloodstained Ritual of the Night).")
-        self.game_path_field.textChanged[str].connect(self.game_path_field_changed)
+        self.game_path_field.textChanged.connect(self.game_path_field_changed)
         center_box_14_layout.addWidget(self.game_path_field, 0, 0)
         
         browse_game_path_button = QPushButton()
@@ -748,7 +749,7 @@ class MainWindow(QGraphicsView):
         
         setting_button = QPushButton("Settings")
         setting_button.setToolTip("Interface settings.")
-        setting_button.setShortcut(Qt.Key_S)
+        setting_button.setShortcut(Qt.Key.Key_S)
         setting_button.clicked.connect(self.setting_button_clicked)
         center_widget_layout.addWidget(setting_button, 9, 0, 1, 1)
         
@@ -774,7 +775,7 @@ class MainWindow(QGraphicsView):
         
         #Window
         
-        self.setFixedSize(self.size_multiplier*1800, self.size_multiplier*1000)
+        self.setFixedSize(int(self.size_multiplier*1800), int(self.size_multiplier*1000))
         self.reset_selected_map_state()
         self.setWindowIcon(QIcon(resource_path("Bloodstained.ico")))
         self.show()
@@ -1164,7 +1165,7 @@ class MainWindow(QGraphicsView):
     def spin_button_1_get_index(self):
         if self.spin_button_1.text():
             return int(self.spin_button_1.text())
-        return None
+        return 0
 
     def spin_button_1_set_index(self, index):
         self.spin_button_1.setText(str(index))
@@ -1180,7 +1181,7 @@ class MainWindow(QGraphicsView):
     def spin_button_2_get_index(self):
         if self.spin_button_2.text():
             return int(self.spin_button_2.text())
-        return None
+        return 0
 
     def spin_button_2_set_index(self, index):
         self.spin_button_2.setText(str(index))
@@ -1196,7 +1197,7 @@ class MainWindow(QGraphicsView):
     def spin_button_3_get_index(self):
         if self.spin_button_3.text():
             return int(self.spin_button_3.text())
-        return None
+        return 0
 
     def spin_button_3_set_index(self, index):
         self.spin_button_3.setText(str(index))
@@ -1212,7 +1213,7 @@ class MainWindow(QGraphicsView):
     def spin_button_4_get_index(self):
         if self.spin_button_4.text():
             return int(self.spin_button_4.text())
-        return None
+        return 0
 
     def spin_button_4_set_index(self, index):
         self.spin_button_4.setText(str(index))
@@ -1228,7 +1229,7 @@ class MainWindow(QGraphicsView):
     def spin_button_5_get_index(self):
         if self.spin_button_5.text():
             return int(self.spin_button_5.text())
-        return None
+        return 0
 
     def spin_button_5_set_index(self, index):
         self.spin_button_5.setText(str(index))
@@ -1244,7 +1245,7 @@ class MainWindow(QGraphicsView):
     def spin_button_6_get_index(self):
         if self.spin_button_6.text():
             return int(self.spin_button_6.text())
-        return None
+        return 0
 
     def spin_button_6_set_index(self, index):
         self.spin_button_6.setText(str(index))
@@ -1260,7 +1261,7 @@ class MainWindow(QGraphicsView):
     def spin_button_8_get_index(self):
         if self.spin_button_8.text():
             return int(self.spin_button_8.text())
-        return None
+        return 0
 
     def spin_button_8_set_index(self, index):
         self.spin_button_8.setText(str(index))
@@ -1276,7 +1277,7 @@ class MainWindow(QGraphicsView):
     def spin_button_9_get_index(self):
         if self.spin_button_9.text():
             return int(self.spin_button_9.text())
-        return None
+        return 0
 
     def spin_button_9_set_index(self, index):
         self.spin_button_9.setText(str(index))
@@ -1292,7 +1293,7 @@ class MainWindow(QGraphicsView):
     def spin_button_10_get_index(self):
         if self.spin_button_10.text():
             return int(self.spin_button_10.text())
-        return None
+        return 0
 
     def spin_button_10_set_index(self, index):
         self.spin_button_10.setText(str(index))
@@ -1308,7 +1309,7 @@ class MainWindow(QGraphicsView):
     def spin_button_11_get_index(self):
         if self.spin_button_11.text():
             return int(self.spin_button_11.text())
-        return None
+        return 0
 
     def spin_button_11_set_index(self, index):
         self.spin_button_11.setText(str(index))
@@ -1324,7 +1325,7 @@ class MainWindow(QGraphicsView):
     def spin_button_12_get_index(self):
         if self.spin_button_12.text():
             return self.language_sequence.index(self.spin_button_12.text()) + 1
-        return None
+        return 0
 
     def spin_button_12_set_index(self, index):
         if index <= len(self.language_sequence):
@@ -1342,7 +1343,7 @@ class MainWindow(QGraphicsView):
     def spin_button_13_get_index(self):
         if self.spin_button_13.text():
             return int(self.spin_button_13.text())
-        return None
+        return 0
 
     def spin_button_13_set_index(self, index):
         self.spin_button_13.setText(str(index))
@@ -1382,7 +1383,7 @@ class MainWindow(QGraphicsView):
             return
         self.preset_drop_down.setCurrentText("Custom")
 
-    def param_string_field_changed(self, text):
+    def param_string_field_changed(self, _):
         #Check that input is valid hex
         try:
             main_num, sub_num = self.get_param_bytes()
@@ -1446,13 +1447,13 @@ class MainWindow(QGraphicsView):
     def custom_level_field_changed(self):
         self.config.set(ConfigSections.special_mode.custom_ng_level, str(self.custom_level_field.value()))
     
-    def starting_items_field_changed(self, text):
+    def starting_items_field_changed(self, text : str):
         self.config.set(ConfigSections.start_with.items, text)
     
-    def game_path_field_changed(self, text):
+    def game_path_field_changed(self, text : str):
         self.config.set(ConfigSections.misc.game_path, text)
     
-    def seed_field_changed(self, text):
+    def seed_field_changed(self, text : str):
         if " " in text:
             self.seed_field.setText(text.replace(" ", ""))
         else:
@@ -1463,16 +1464,14 @@ class MainWindow(QGraphicsView):
     
     def seed_test_button_clicked(self):
         #Check seed
-        
         if not self.config.get(ConfigSections.misc.seed):
             return
-        self.selected_seed = self.cast_seed(self.config.get(ConfigSections.misc.seed))
+        
+        self.selected_seed = self.config.get(ConfigSections.misc.seed)
         self.selected_map = self.config.get(ConfigSections.map.selected_map) if self.config.getboolean(ConfigSections.map.room_layout) else ""
         
         #Start
-        
-        Manager.init()
-        Manager.load_constant()
+        Data.reload_data()
         
         Item.init()
         Enemy.init()
@@ -1513,7 +1512,7 @@ class MainWindow(QGraphicsView):
         if self.config.getboolean(ConfigSections.extra.bloodless_candles):
             box.setText(Bloodless.create_log_string(self.selected_seed, self.selected_map))
         elif self.config.getboolean(ConfigSections.item.overworld_pool):
-            box.setText(Item.create_log_string(self.selected_seed, self.selected_map, Enemy.enemy_replacement_invert))
+            box.setText(Item.create_log_string(self.selected_seed, self.selected_map))
         else:
             box.setText("No keys to randomize")
         box.exec()
@@ -1527,13 +1526,6 @@ class MainWindow(QGraphicsView):
     def dlc_check_box_changed(self):
         checked = self.dlc_check_box.isChecked()
         self.config.set(ConfigSections.misc.ignore_dlc, str(checked).lower())
-
-    def cast_seed(self, seed):
-        #Cast seed to another object type if possible
-        try:
-            return float(seed) if "." in seed else int(seed)
-        except ValueError:
-            return seed
     
     def setting_apply_button_clicked(self):
         if self.config.getint(ConfigSections.misc.window_size) == window_sizes[self.window_size_drop_down.currentIndex()]:
@@ -1668,7 +1660,7 @@ class MainWindow(QGraphicsView):
     def dlc_failure(self):
         box = QMessageBox(self)
         box.setWindowTitle("Warning")
-        box.setIcon(QMessageBox.Warning)
+        box.setIcon(QMessageBox.Icon.Warning)
         box.setText("Failed to retrieve DLC information from user installation. Proceeding without DLC.")
         box.exec()
     
@@ -1686,10 +1678,10 @@ class MainWindow(QGraphicsView):
             if not item:
                 continue
             simple_name = Utility.simplify_item_name(item)
-            if not simple_name in Manager.start_item_translation:
+            if not simple_name in Data.start_item_translation:
                 self.notify_error("Starting item name invalid.")
                 return
-            item_name = Manager.start_item_translation[simple_name]
+            item_name = Data.start_item_translation[simple_name]
             if "Skilled" in item_name:
                 self.starting_items.append(item_name.replace("Skilled", ""))
             self.starting_items.append(item_name)
@@ -1712,19 +1704,19 @@ class MainWindow(QGraphicsView):
     def pre_generate(self):
         #Check if every asset is already cached
         
-        if os.path.isdir(Manager.asset_dir): 
+        if os.path.isdir(ASSETS_DIR): 
             cached_assets = []
-            for root, dirs, files in os.walk(Manager.asset_dir):
+            for root, dirs, files in os.walk(ASSETS_DIR):
                 for file in files:
                     name = os.path.splitext(file)[0]
                     cached_assets.append(name)
             cached_assets = list(dict.fromkeys(cached_assets))
             asset_list = []
-            for file in Manager.file_to_path:
+            for file in Data.file_to_path:
                 if not file in cached_assets:
                     asset_list.append(file)
         else:
-            asset_list = list(Manager.file_to_path)
+            asset_list = list(Data.file_to_path)
         
         self.import_assets(asset_list, self.generate_pak) if asset_list else self.generate_pak()
     
@@ -1732,11 +1724,11 @@ class MainWindow(QGraphicsView):
         self.setEnabled(False)
         QApplication.processEvents()
         
-        self.progress_bar = QProgressDialog("Initializing...", None, 0, 7, self)
+        self.progress_bar = QProgressDialog("Initializing...", None, 0, 7, self) # type: ignore
         self.progress_bar.setWindowTitle("Status")
-        self.progress_bar.setWindowModality(Qt.WindowModal)
+        self.progress_bar.setWindowModality(Qt.WindowModality.WindowModal)
         
-        self.selected_seed = self.cast_seed(self.config.get(ConfigSections.misc.seed))
+        self.selected_seed = self.config.get(ConfigSections.misc.seed)
         self.selected_map = self.config.get(ConfigSections.map.selected_map) if self.config.getboolean(ConfigSections.map.room_layout) else ""
         self.worker = Generate(self.config, self.progress_bar, self.selected_seed, self.selected_map, self.starting_items, self.owned_dlc)
         self.worker.signaller.progress.connect(self.set_progress)
@@ -1788,7 +1780,7 @@ class MainWindow(QGraphicsView):
         self.outfit_window = QDialog(self)
         self.outfit_window.setLayout(self.outfit_window_layout)
         self.outfit_window.setWindowTitle("Outfit")
-        self.outfit_window.setFixedSize(0, self.size_multiplier*min(140 + max_size*24, 500))
+        self.outfit_window.setFixedSize(0, int(self.size_multiplier*min(140 + max_size*24, 500)))
         self.outfit_window.exec()
     
     def outfit_confirm_button_clicked(self):
@@ -1850,15 +1842,15 @@ class MainWindow(QGraphicsView):
             self.notify_error("Game path invalid, input the path to your game's data\n(...\\steamapps\\common\\Bloodstained Ritual of the Night).")
             return
         
-        self.import_assets(list(Manager.file_to_path), self.import_finished)
+        self.import_assets(list(Data.file_to_path), self.import_finished)
 
     def import_assets(self, asset_list, finished):
         self.setEnabled(False)
         QApplication.processEvents()
         
-        self.progress_bar = QProgressDialog("Importing assets...", None, 0, len(asset_list), self)
+        self.progress_bar = QProgressDialog("Importing assets...", None, 0, len(asset_list), self) # type: ignore
         self.progress_bar.setWindowTitle("Status")
-        self.progress_bar.setWindowModality(Qt.WindowModal)
+        self.progress_bar.setWindowModality(Qt.WindowModality.WindowModal)
         
         self.worker = Import(self.config, asset_list)
         self.worker.signaller.progress.connect(self.set_progress)
@@ -1874,7 +1866,7 @@ class MainWindow(QGraphicsView):
         credit_1_label_image = QLabel()
         credit_1_label_image.setPixmap(QPixmap("Data\\profile1.png"))
         credit_1_label_image.setScaledContents(True)
-        credit_1_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_1_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_1_layout.addWidget(credit_1_label_image)
         credit_1_label_text = QLabel()
         credit_1_label_text.setText("<span style=\"font-weight: bold; color: #67aeff;\">Lakifume</span><br/>Author of True Randomization<br/><a href=\"https://github.com/Lakifume\"><font face=Cambria color=#67aeff>Github</font></a>")
@@ -1884,7 +1876,7 @@ class MainWindow(QGraphicsView):
         credit_2_label_image = QLabel()
         credit_2_label_image.setPixmap(QPixmap("Data\\profile2.png"))
         credit_2_label_image.setScaledContents(True)
-        credit_2_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_2_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_2_layout.addWidget(credit_2_label_image)
         credit_2_label_text = QLabel()
         credit_2_label_text.setText("<span style=\"font-weight: bold; color: #e91e63;\">FatihG_</span><br/>Founder of Bloodstained Modding<br/><a href=\"http://discord.gg/b9XBH4f\"><font face=Cambria color=#e91e63>Discord</font></a>")
@@ -1894,7 +1886,7 @@ class MainWindow(QGraphicsView):
         credit_3_label_image = QLabel()
         credit_3_label_image.setPixmap(QPixmap("Data\\profile3.png"))
         credit_3_label_image.setScaledContents(True)
-        credit_3_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_3_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_3_layout.addWidget(credit_3_label_image)
         credit_3_label_text = QLabel()
         credit_3_label_text.setText("<span style=\"font-weight: bold; color: #e6b31a;\">Joneirik</span><br/>Datatable researcher<br/><a href=\"http://wiki.omf2097.com/doku.php?id=joneirik:bs:start\"><font face=Cambria color=#e6b31a>Wiki</font></a>")
@@ -1904,7 +1896,7 @@ class MainWindow(QGraphicsView):
         credit_4_label_image = QLabel()
         credit_4_label_image.setPixmap(QPixmap("Data\\profile4.png"))
         credit_4_label_image.setScaledContents(True)
-        credit_4_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_4_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_4_layout.addWidget(credit_4_label_image)
         credit_4_label_text = QLabel()
         credit_4_label_text.setText("<span style=\"font-weight: bold; color: #db1ee9;\">Atenfyr</span><br/>Creator of UAssetAPI<br/><a href=\"https://github.com/atenfyr/UAssetAPI\"><font face=Cambria color=#db1ee9>Github</font></a>")
@@ -1914,7 +1906,7 @@ class MainWindow(QGraphicsView):
         credit_5_label_image = QLabel()
         credit_5_label_image.setPixmap(QPixmap("Data\\profile5.png"))
         credit_5_label_image.setScaledContents(True)
-        credit_5_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_5_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_5_layout.addWidget(credit_5_label_image)
         credit_5_label_text = QLabel()
         credit_5_label_text.setText("<span style=\"font-weight: bold; color: #25c04e;\">Giwayume</span><br/>Creator of Bloodstained Level Editor<br/><a href=\"https://github.com/Giwayume/BloodstainedLevelEditor\"><font face=Cambria color=#25c04e>Github</font></a>")
@@ -1924,7 +1916,7 @@ class MainWindow(QGraphicsView):
         credit_6_label_image = QLabel()
         credit_6_label_image.setPixmap(QPixmap("Data\\profile6.png"))
         credit_6_label_image.setScaledContents(True)
-        credit_6_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_6_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_6_layout.addWidget(credit_6_label_image)
         credit_6_label_text = QLabel()
         credit_6_label_text.setText("<span style=\"font-weight: bold; color: #ffffff;\">Matyalatte</span><br/>Creator of UE4 DDS Tools<br/><a href=\"https://github.com/matyalatte/UE4-DDS-Tools\"><font face=Cambria color=#ffffff>Github</font></a>")
@@ -1934,7 +1926,7 @@ class MainWindow(QGraphicsView):
         credit_7_label_image = QLabel()
         credit_7_label_image.setPixmap(QPixmap("Data\\profile7.png"))
         credit_7_label_image.setScaledContents(True)
-        credit_7_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_7_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_7_layout.addWidget(credit_7_label_image)
         credit_7_label_text = QLabel()
         credit_7_label_text.setText("<span style=\"font-weight: bold; color: #7b9aff;\">Chrisaegrimm</span><br/>Testing and suffering<br/><a href=\"https://www.twitch.tv/chrisaegrimm\"><font face=Cambria color=#7b9aff>Twitch</font></a>")
@@ -1944,14 +1936,14 @@ class MainWindow(QGraphicsView):
         credit_8_label_image = QLabel()
         credit_8_label_image.setPixmap(QPixmap("Data\\profile8.png"))
         credit_8_label_image.setScaledContents(True)
-        credit_8_label_image.setFixedSize(self.size_multiplier*60, self.size_multiplier*60)
+        credit_8_label_image.setFixedSize(int(self.size_multiplier*60), int(self.size_multiplier*60))
         credit_8_layout.addWidget(credit_8_label_image)
         credit_8_label_text = QLabel()
         credit_8_label_text.setText("<span style=\"font-weight: bold; color: #dd872e;\">Tourmi</span><br/>True Randomization Contributor<br/><a href=\"https://github.com/Tourmi\"><font face=Cambria color=#dd872e>Github</font></a>")
         credit_8_label_text.setOpenExternalLinks(True)
         credit_8_layout.addWidget(credit_8_label_text)
         credit_box_layout = QVBoxLayout()
-        credit_box_layout.setSpacing(self.size_multiplier*10)
+        credit_box_layout.setSpacing(int(self.size_multiplier*10))
         credit_box_layout.addLayout(credit_1_layout)
         credit_box_layout.addLayout(credit_8_layout)
         credit_box_layout.addLayout(credit_4_layout)
@@ -1975,7 +1967,7 @@ class MainWindow(QGraphicsView):
     def notify_error(self, message):
         box = QMessageBox(self)
         box.setWindowTitle("Error")
-        box.setIcon(QMessageBox.Critical)
+        box.setIcon(QMessageBox.Icon.Critical)
         box.setText(message)
         box.exec()
     
@@ -1996,16 +1988,20 @@ class MainWindow(QGraphicsView):
             self.check_for_resolution()
             return
         if tag > LooseVersion(self.config.get(ConfigSections.misc.version)):
-            choice = QMessageBox.question(self, "Auto Updater", "New version found:\n\n" + release_json["body"] + "\n\nUpdate ?", QMessageBox.Yes | QMessageBox.No)
-            if choice == QMessageBox.Yes:
+            choice = QMessageBox.question(self, 
+                                          "Auto Updater", 
+                                          "New version found:\n\n" + release_json["body"] + "\n\nUpdate ?", 
+                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            if choice == QMessageBox.StandardButton.Yes:
                 if "Map Editor.exe" in (program.name() for program in psutil.process_iter()):
                     self.notify_error("MapEditor.exe is running, cannot overwrite.")
                     self.check_for_resolution()
                     return
                 
-                self.progress_bar = QProgressDialog("Downloading...", None, 0, release_json["assets"][0]["size"], self)
+                
+                self.progress_bar = QProgressDialog("Downloading...", None, 0, release_json["assets"][0]["size"], self) # type: ignore
                 self.progress_bar.setWindowTitle("Status")
-                self.progress_bar.setWindowModality(Qt.WindowModal)
+                self.progress_bar.setWindowModality(Qt.WindowModality.WindowModal)
                 self.progress_bar.setAutoClose(False)
                 self.progress_bar.setAutoReset(False)
                 

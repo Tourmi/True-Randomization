@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import configparser
+from configparser import ConfigParser, NoOptionError, NoSectionError, _UNSET # type: ignore
 import sys
 
 from .ConfigSections import ConfigSections
@@ -10,10 +10,10 @@ DEFAULT_CONFIG_PATH = "Data\\config.ini"
 
 class Config:
     def __init__(self, config_path = DEFAULT_CONFIG_PATH):
-        self._config = configparser.ConfigParser()
+        self._config = ConfigParser()
         self.config_path = config_path
 
-        self._config.optionxform = str
+        self._config.optionxform = lambda optionstr: optionstr
         self._config.read(config_path)
     
     def write(self):
@@ -40,21 +40,21 @@ class Config:
                     continue
                 try:
                     config._config.set(section, key, self._config.get(section, key))
-                except (configparser.NoSectionError, configparser.NoOptionError):
+                except (NoSectionError, NoOptionError):
                     continue
 
 
     def get(self, option : ConfigOption[str]) -> str:
-        return self._config.get(option.section_name, option.option_key, fallback= option.default_value)
+        return self._config.get(option.section_name, option.option_key, fallback= option.default_value if option.default_value != None else _UNSET)
     
     def getint(self, option : ConfigOption[int]) -> int:
-        return self._config.getint(option.section_name, option.option_key, fallback= option.default_value)
+        return self._config.getint(option.section_name, option.option_key, fallback= option.default_value if option.default_value != None else _UNSET)
     
     def getboolean(self, option : ConfigOption[bool]) -> bool:
-        return self._config.getboolean(option.section_name, option.option_key, fallback= option.default_value)
+        return self._config.getboolean(option.section_name, option.option_key, fallback= option.default_value if option.default_value != None else _UNSET)
 
     def getfloat(self, option : ConfigOption[float]) -> float:
-        return self._config.getfloat(option.section_name, option.option_key, fallback= option.default_value)
+        return self._config.getfloat(option.section_name, option.option_key, fallback= option.default_value if option.default_value != None else _UNSET)
 
     def set(self, option : ConfigOption, value : object):
         self._config.set(option.section_name, option.option_key, str(value))

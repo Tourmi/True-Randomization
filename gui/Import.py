@@ -2,14 +2,13 @@ import os
 import shutil
 import traceback
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import QThread
 
-from configuration.Config import Config
-from configuration.ConfigSections import ConfigSections
+from randomizer.Constants import ASSETS_DIR
+from randomizer import Data
+from configuration import Config
+from configuration import ConfigSections
 from .Signaller import Signaller
-import Manager
 
 class Import(QThread):
     def __init__(self, config : Config, asset_list):
@@ -30,15 +29,15 @@ class Import(QThread):
         
         #Extract specific assets from the game's pak using UModel
         
-        if os.path.isdir(Manager.asset_dir) and self.asset_list == list(Manager.file_to_path):
-            shutil.rmtree(Manager.asset_dir)
+        if os.path.isdir(ASSETS_DIR) and self.asset_list == list(Data.file_to_path):
+            shutil.rmtree(ASSETS_DIR)
         
         for asset in self.asset_list:
             output_path = os.path.abspath("")
             
             root = os.getcwd()
             os.chdir("Tools\\UModel")
-            os.system("cmd /c umodel_64.exe -path=\"" + self.config.get(ConfigSections.misc.game_path) + "\\BloodstainedRotN\\Content\\Paks\" -out=\"" + output_path + "\" -save \"" + Manager.asset_dir + "\\" + Manager.file_to_path[asset] + "\\" + asset.split("(")[0] + "\"")
+            os.system("cmd /c umodel_64.exe -path=\"" + self.config.get(ConfigSections.misc.game_path) + "\\BloodstainedRotN\\Content\\Paks\" -out=\"" + output_path + "\" -save \"" + ASSETS_DIR + "\\" + Data.file_to_path[asset] + "\\" + asset.split("(")[0] + "\"")
             os.chdir(root)
             
             current += 1

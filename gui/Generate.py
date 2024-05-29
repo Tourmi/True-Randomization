@@ -1,24 +1,24 @@
-import Manager
-import Item
-import Shop
-import Library
-import Shard
-import Equipment
-import Enemy
-import Room
-import Graphic
-import Sound
-import Bloodless
-import Utility
+from randomizer import Manager
+from randomizer import Item
+from randomizer import Shop
+from randomizer import Library
+from randomizer import Shard
+from randomizer import Equipment
+from randomizer import Enemy
+from randomizer import Room
+from randomizer import Graphic
+from randomizer import Sound
+from randomizer import Bloodless
+from randomizer.DLCType import DLCType
 
-from DLCType import DLCType
+from randomizer.Constants import MOD_DIR
+from randomizer.Data import Data
 from configuration import Config
 from configuration import ConfigSections
 from .Signaller import Signaller
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import QThread
+from PySide6.QtWidgets import QProgressDialog
 
 import os
 import shutil
@@ -26,12 +26,12 @@ import glob
 import random
 import traceback
 
-cheats = {
+_CHEATS = {
     "BIGTOSS": Manager.set_bigtoss_mode
 }
 
 class Generate(QThread):
-    def __init__(self, config : Config, progress_bar, selected_seed, selected_map, starting_items, owned_dlc):
+    def __init__(self, config : Config, progress_bar : QProgressDialog, selected_seed : str, selected_map, starting_items, owned_dlc):
         QThread.__init__(self)
         self.config = config
         self.signaller = Signaller()
@@ -54,20 +54,20 @@ class Generate(QThread):
         #Check DLCs
         
         if not DLCType.IGA in self.owned_dlc:
-            for file in list(Manager.file_to_path):
-                if "DLC_0002" in Manager.file_to_path[file]:
-                    del Manager.file_to_path[file]
-                    del Manager.file_to_type[file]
+            for file in list(Data.file_to_path):
+                if "DLC_0002" in Data.file_to_path[file]:
+                    del Data.file_to_path[file]
+                    del Data.file_to_type[file]
         
         #Mod directory
         
-        if os.path.isdir(Manager.mod_dir):
-            shutil.rmtree(Manager.mod_dir)
-        for directory in list(Manager.file_to_path.values()):
-            if not os.path.isdir(f"{Manager.mod_dir}\\{directory}"):
-                os.makedirs(f"{Manager.mod_dir}\\{directory}")
-        if not os.path.isdir(f"{Manager.mod_dir}\\Core\\UI\\Dialog\\Data\\LipSync"):
-            os.makedirs(f"{Manager.mod_dir}\\Core\\UI\\Dialog\\Data\\LipSync")
+        if os.path.isdir(MOD_DIR):
+            shutil.rmtree(MOD_DIR)
+        for directory in list(Data.file_to_path.values()):
+            if not os.path.isdir(f"{MOD_DIR}\\{directory}"):
+                os.makedirs(f"{MOD_DIR}\\{directory}")
+        if not os.path.isdir(f"{MOD_DIR}\\Core\\UI\\Dialog\\Data\\LipSync"):
+            os.makedirs(f"{MOD_DIR}\\Core\\UI\\Dialog\\Data\\LipSync")
         
         #Log directory
         
@@ -79,9 +79,8 @@ class Generate(QThread):
         
         self.progress_bar.setLabelText("Loading data...")
         
-        Manager.init()
-        Manager.load_game_data()
-        Manager.load_constant()
+        Data.reload_data()
+        
         current += 1
         self.signaller.progress.emit(current)
         
@@ -89,7 +88,7 @@ class Generate(QThread):
         
         self.progress_bar.setLabelText("Processing data...")
         
-        Manager.table_complex_to_simple()
+        Data.table_complex_to_simple()
         #Manager.debug_output_datatables()
         current += 1
         self.signaller.progress.emit(current)
@@ -99,16 +98,10 @@ class Generate(QThread):
         #Init classes
         
         Item.init()
-        Shop.init()
         Library.init()
-        Shard.init()
-        Equipment.init()
         Enemy.init()
         Room.init()
-        Graphic.init()
-        Sound.init()
         Bloodless.init()
-        Utility.init()
         miriam_color = None
         zangetsu_color = None
         
@@ -145,10 +138,10 @@ class Generate(QThread):
         #Apply cheats
         
         if type(self.selected_seed) is str:
-            for code in cheats:
+            for code in _CHEATS:
                 if code in self.selected_seed:
                     random.seed(self.selected_seed)
-                    cheats[code]()
+                    _CHEATS[code]()
         
         #Datatables
         
@@ -341,7 +334,7 @@ class Generate(QThread):
         if self.config.getboolean(ConfigSections.special_mode.progressive_z):
             if self.config.getboolean(ConfigSections.difficulty.nightmare):
                 Manager.set_single_difficulty("Hard")
-                Manager.stringtable["PBSystemStringTable"]["SYS_SEN_Difficulty_Hard"] = "Nightmare"
+                Manager.Data.stringtable["PBSystemStringTable"]["SYS_SEN_Difficulty_Hard"] = "Nightmare"
                 Enemy.set_zangetsu_enemy_exp()
                 Enemy.set_zangetsu_nightmare_damage()
             Enemy.reset_zangetsu_starting_stats()
@@ -349,8 +342,8 @@ class Generate(QThread):
             Equipment.reset_zangetsu_black_belt()
         
         #Update some things to reflect previous changes
-        Item.update_drop_ids()
-        Item.update_container_types()
+        Item.ensure_drop_ids_unique()
+        Room.update_container_types()
         Item.update_shard_candles()
         Bloodless.update_shard_candles()
         Shard.update_special_properties()
@@ -364,7 +357,7 @@ class Generate(QThread):
             Room.update_map_indicators()
         
         #Display game version, mod version and seed on the title screen
-        Manager.show_mod_stats(str(self.selected_seed), self.config.get(ConfigSections.misc.version))
+        Manager.show_mod_stats(self.selected_seed, self.config.get(ConfigSections.misc.version))
         
         #Write the spoiler logs
         if self.config.getboolean(ConfigSections.extra.bloodless_candles):
@@ -386,7 +379,7 @@ class Generate(QThread):
                 Graphic.import_mesh(file_name)
         
         #Add new armor references defined in the json
-        for item in Manager.constant["ArmorReference"]:
+        for item in Data.constant["ArmorReference"]:
             Equipment.add_armor_reference(item)
         
         #Add and import any music files found in the music directory
@@ -401,8 +394,8 @@ class Generate(QThread):
         
         self.progress_bar.setLabelText("Converting data...")
         
-        Manager.table_simple_to_complex()
-        Manager.update_datatable_order()
+        Data.table_simple_to_complex()
+        Data.update_datatable_order()
         current += 1
         self.signaller.progress.emit(current)
         
