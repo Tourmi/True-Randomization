@@ -1,4 +1,5 @@
 from .ConfigSection import ConfigSection
+from .Archipelago import Archipelago
 from .Difficulty import Difficulty
 from .Enemy import Enemy
 from .Equipment import Equipment

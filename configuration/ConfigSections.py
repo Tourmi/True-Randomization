@@ -1,6 +1,7 @@
 from .sections import *
 
 class ConfigSections():
+    archipelago = Archipelago()
     difficulty = Difficulty()
     enemy = Enemy()
     equipment = Equipment()

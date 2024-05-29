@@ -37,9 +37,6 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-steam_id = "Steam"
-gog_id = "GOG Games"
-
 map_num = len(glob.glob("MapEdit\\Custom\\*.json"))
 
 window_sizes = [720, 900, 1080]
@@ -228,7 +225,6 @@ class MainWindow(QGraphicsView):
         right_groupbox_layout.addLayout(right_groupbox_layout_bottom)
         
         discord_label = QLabel()
-        discord_label.setStyleSheet("border: 2px solid transparent")
         discord_label.setText("<a href=\"https://discord.gg/nUbFA7MEeU\"><font face=Cambria color=#0080ff>Discord</font></a>")
         discord_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         discord_label.setOpenExternalLinks(True)
@@ -573,24 +569,29 @@ class MainWindow(QGraphicsView):
         self.preset_drop_down.currentIndexChanged.connect(self.preset_drop_down_changed)
         center_box_12_layout.addWidget(self.preset_drop_down, 0, 0)
         
-        #Interface Settings
+        #Settings
         
         self.setting_window_layout = QVBoxLayout()
         
-        window_size_box_layout = QVBoxLayout()
-        window_size_box = QGroupBox("Window Size")
-        window_size_box.setLayout(window_size_box_layout)
-        self.setting_window_layout.addWidget(window_size_box)
+        window_size_layout = QHBoxLayout()
+        self.setting_window_layout.addLayout(window_size_layout)
+
+        archi_name_label = QLabel("Window Size")
+        window_size_layout.addWidget(archi_name_label)
         
         self.window_size_drop_down = QComboBox()
         self.window_size_drop_down.addItem("720p")
         self.window_size_drop_down.addItem("900p")
         self.window_size_drop_down.addItem("1080p and above")
-        window_size_box_layout.addWidget(self.window_size_drop_down)
+        window_size_layout.addWidget(self.window_size_drop_down)
+
+        setting_apply_layout = QHBoxLayout()
+        self.setting_window_layout.addLayout(setting_apply_layout)
         
         setting_apply_button = QPushButton("Apply")
         setting_apply_button.clicked.connect(self.setting_apply_button_clicked)
-        self.setting_window_layout.addWidget(setting_apply_button)
+        setting_apply_layout.addStretch(1)
+        setting_apply_layout.addWidget(setting_apply_button)
         
         #Seed
         
@@ -666,7 +667,56 @@ class MainWindow(QGraphicsView):
         outfit_confirm_button.clicked.connect(self.outfit_confirm_button_clicked)
         outfit_window_bottom.addStretch(1)
         outfit_window_bottom.addWidget(outfit_confirm_button)
-        
+
+        #Archipelago
+
+        self.archi_window_layout = QVBoxLayout()
+
+        self.archi_check_box = QCheckBox("Enable Archipelago")
+        self.archi_window_layout.addWidget(self.archi_check_box)
+
+        archi_name_layout = QHBoxLayout()
+        self.archi_window_layout.addLayout(archi_name_layout)
+
+        archi_name_label = QLabel("Archipelago Name")
+        archi_name_layout.addWidget(archi_name_label)
+
+        self.archi_name_field = QLineEdit()
+        archi_name_layout.addWidget(self.archi_name_field)
+        progression_layout = QHBoxLayout()
+        self.archi_window_layout.addLayout(progression_layout)
+
+        progression_label = QLabel("Progression Balancing")
+        progression_layout.addWidget(progression_label)
+
+        self.progression_field = QSpinBox()
+        self.progression_field.setRange(0, 99)
+        progression_layout.addWidget(self.progression_field)
+
+        accessibility_layout = QHBoxLayout()
+        self.archi_window_layout.addLayout(accessibility_layout)
+
+        accessibility_label = QLabel("Accessibility")
+        accessibility_layout.addWidget(accessibility_label)
+
+        self.accessibility_drop_down = QComboBox()
+        self.accessibility_drop_down.addItem("Locations")
+        self.accessibility_drop_down.addItem("Items")
+        self.accessibility_drop_down.addItem("Minimal")
+        accessibility_layout.addWidget(self.accessibility_drop_down)
+
+        self.death_link_check_box = QCheckBox("Death Link")
+        self.archi_window_layout.addWidget(self.death_link_check_box)
+
+        archi_apply_layout = QHBoxLayout()
+        self.archi_window_layout.addLayout(archi_apply_layout)
+
+        archi_apply_button = QPushButton("Apply")
+        archi_apply_button.clicked.connect(self.archi_apply_button_clicked)
+        archi_apply_layout.addStretch(1)
+        archi_apply_layout.addWidget(archi_apply_button)
+
+
         #Text field
         
         self.starting_items_field = QLineEdit(self.config.get(ConfigSections.start_with.items))
@@ -1599,9 +1649,17 @@ class MainWindow(QGraphicsView):
         #Shantae is on by default
         dlc_list = [DLCType.Shantae]
         #Steam
-        if steam_id in self.config.get(ConfigSections.misc.game_path):
-            #Look through the Steam config files
-            steam_path = self.config.get(ConfigSections.misc.game_path).split(steam_id)[0] + steam_id
+        if "steamapps" in self.config.get(ConfigSections.misc.game_path):
+            steam_path = os.path.abspath(os.path.join(self.config.get(ConfigSections.misc.game_path), "../../.."))
+
+            #Override the Steam path if the game path is on another drive
+            library_config_path = f"{steam_path}\\libraryfolder.vdf"
+            if os.path.isfile(library_config_path):
+                with open(library_config_path, "r", encoding="utf8") as file_reader:
+                    steam_exe_path = self.lowercase_vdf_dict(vdf.parse(file_reader))["libraryfolder"]["launcher"]
+                    steam_path = os.path.split(steam_exe_path)[0]
+
+            #Get user config
             user_config_path = f"{steam_path}\\config\\loginusers.vdf"
             if not os.path.isfile(user_config_path):
                 self.dlc_failure()
@@ -1614,6 +1672,7 @@ class MainWindow(QGraphicsView):
                 if user_config[user]["mostrecent"] == "1":
                     steam_user = int(user) - 76561197960265728
                     break
+            #Get local config
             local_config_path = f"{steam_path}\\userdata\\{steam_user}\\config\\localconfig.vdf"
             if not os.path.isfile(local_config_path):
                 self.dlc_failure()
@@ -1631,7 +1690,7 @@ class MainWindow(QGraphicsView):
                 dlc_list.append(DLCType.Japanese)
             return dlc_list
         #GOG
-        if gog_id in self.config.get(ConfigSections.misc.game_path):
+        if "GOG Games" in self.config.get(ConfigSections.misc.game_path):
             #List the DLC IDs in the game path
             dlc_id_list = []
             for file in glob.glob(self.config.get(ConfigSections.misc.game_path) + "\\*.hashdb"):
@@ -1861,6 +1920,27 @@ class MainWindow(QGraphicsView):
     def import_finished(self):
         self.setEnabled(True)
 
+    def archipelago_button_clicked(self):
+        self.archi_check_box.setChecked(self.config.getboolean(ConfigSections.archipelago.enabled))
+        self.archi_name_field.setText(self.config.get(ConfigSections.archipelago.name))
+        self.progression_field.setValue(self.config.getint(ConfigSections.archipelago.progression))
+        dropdown_index = self.accessibility_drop_down.findText(self.config.get(ConfigSections.archipelago.accessibility).capitalize())
+        self.accessibility_drop_down.setCurrentIndex(dropdown_index)
+        self.death_link_check_box.setChecked(self.config.getboolean(ConfigSections.archipelago.death_link))
+        self.archi_window = QDialog(self)
+        self.archi_window.setLayout(self.archi_window_layout)
+        self.archi_window.setWindowTitle("Archipelago")
+        self.archi_window.setFixedSize(int(self.size_multiplier*400), 0)
+        self.archi_window.exec()
+
+    def archi_apply_button_clicked(self):
+        self.config.set(ConfigSections.archipelago.enabled, self.archi_check_box.isChecked())
+        self.config.set(ConfigSections.archipelago.name, self.archi_name_field.text())
+        self.config.set(ConfigSections.archipelago.progression, self.progression_field.value())
+        self.config.set(ConfigSections.archipelago.accessibility, self.accessibility_drop_down.currentText().lower())
+        self.config.set(ConfigSections.archipelago.death_link, self.death_link_check_box.isChecked())
+        self.archi_window.close()
+    
     def credit_button_clicked(self):
         credit_1_layout = QHBoxLayout()
         credit_1_label_image = QLabel()

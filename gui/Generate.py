@@ -72,8 +72,10 @@ class Generate(QThread):
         #Log directory
         
         if os.path.isdir("Spoiler"):
-            shutil.rmtree("Spoiler")
-        os.makedirs("Spoiler")
+            for file in os.listdir("Spoiler"):
+                os.remove(f"Spoiler\\{file}")
+        else:
+            os.makedirs("Spoiler")
         
         #Open files
         

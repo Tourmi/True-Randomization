@@ -482,6 +482,12 @@ def apply_default_tweaks():
     Data.datatable["PB_DT_ArmorMaster"]["FestivalKimono"]  = copy.deepcopy(Data.datatable["PB_DT_ArmorMaster"]["FestivalKimono1"])
     Data.datatable["PB_DT_ArmorMaster"]["FestivalKimono2"] = copy.deepcopy(Data.datatable["PB_DT_ArmorMaster"]["FestivalKimono3"])
     Data.datatable["PB_DT_ArmorMaster"]["FestivalKimono4"] = copy.deepcopy(Data.datatable["PB_DT_ArmorMaster"]["FestivalKimono5"])
+    #Give the Valkyrie set a luck bonus if both are equipped
+    Data.datatable["PB_DT_SetBonus"]["Valkyriedress"] = copy.deepcopy(Data.datatable["PB_DT_SetBonus"]["COL_Au15_Dress"])
+    Data.datatable["PB_DT_SetBonus"]["Valkyriedress"]["FaceIcon"] = "EIconType::Default"
+    Data.datatable["PB_DT_SetBonus"]["Valkyriedress"]["Head"] = "ValkyrieTiara"
+    Data.datatable["PB_DT_SetBonus"]["Valkyriedress"]["Body"] = "Valkyriedress"
+    Data.datatable["PB_DT_SetBonus"]["Valkyriedress"]["LCK"] = 10
     #With this mod vanilla rando is pointless and obselete so remove its widget
     #Also prevent going online with this mod active
     remove_unwanted_modes()
