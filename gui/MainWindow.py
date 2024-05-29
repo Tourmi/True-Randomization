@@ -810,7 +810,7 @@ class MainWindow(QGraphicsView):
         
         archipelago_button = QPushButton("Coming Soon")
         archipelago_button.setToolTip("™")
-        #archipelago_button.clicked.connect(self.archipelago_button_clicked)
+        archipelago_button.clicked.connect(self.archipelago_button_clicked)
         center_widget_layout.addWidget(archipelago_button, 9, 2, 1, 1)
         
         credit_button = QPushButton("Credits")

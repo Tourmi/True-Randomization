@@ -3,6 +3,7 @@ from __future__ import annotations
 from configparser import ConfigParser, NoOptionError, NoSectionError, _UNSET # type: ignore
 import sys
 
+from .sections import ConfigSection
 from .ConfigSections import ConfigSections
 from .ConfigOption import ConfigOption
 
@@ -15,6 +16,11 @@ class Config:
 
         self._config.optionxform = lambda optionstr: optionstr
         self._config.read(config_path)
+        sections : list[ConfigSection] = [var[1] for var in vars(ConfigSections).items() if not var[0].startswith("_")]
+        for section in sections:
+            if not self._config.has_section(section.section_name):
+                self._config.add_section(section.section_name)
+
     
     def write(self):
         """

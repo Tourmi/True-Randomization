@@ -27,7 +27,7 @@ class Data:
         cls.datatable : Datatable = {}
         cls.stringtable : dict[str, dict[str, str]] = {}
         cls.file_to_path : dict[str, str] = Utility.read_json("Data\\FileToPath.json")
-        cls.file_to_type : dict[str, FileType] = {filepath:Utility.get_file_type(filepath) for filepath in cls.file_to_path.values()}
+        cls.file_to_type : dict[str, FileType] = {file:Utility.get_file_type(path) for file, path in cls.file_to_path.items()}
         cls.constant = Utility.read_json_files("Data\\Constant")
         cls.translation : dict[str, dict[str, str]] = Utility.read_json_files("Data\\Translation")
         cls.load_start_item_translations()
@@ -35,10 +35,10 @@ class Data:
     @classmethod
     def load_game_data(cls):
         cls.game_data : dict[str, UAsset] = {}
-        for file, filetype in Data.file_to_type.items():
+        for file, filetype in cls.file_to_type.items():
             if filetype in _LOAD_TYPES:
                 extension = ".umap" if filetype == FileType.Level else ".uasset"
-                cls.game_data[file] = UAsset(f"{ASSETS_DIR}\\{Data.file_to_path[file]}\\" + file.split("(")[0] + extension, EngineVersion.VER_UE4_22)
+                cls.game_data[file] = UAsset(f"{ASSETS_DIR}\\{cls.file_to_path[file]}\\" + file.split("(")[0] + extension, EngineVersion.VER_UE4_22)
 
     @classmethod
     def load_start_item_translations(cls):
@@ -107,9 +107,9 @@ class Data:
             for entry_1 in cls.datatable_entry_index[file]:
                 old_index = list(cls.datatable[file]).index(entry_1)
                 new_index = cls.datatable_entry_index[file][entry_1]
-                current_entry = Data.game_data[file].Exports[0].Table.Data[old_index].Clone()
-                Data.game_data[file].Exports[0].Table.Data.Remove(Data.game_data[file].Exports[0].Table.Data[old_index])
-                Data.game_data[file].Exports[0].Table.Data.Insert(new_index, current_entry)
+                current_entry = cls.game_data[file].Exports[0].Table.Data[old_index].Clone()
+                cls.game_data[file].Exports[0].Table.Data.Remove(cls.game_data[file].Exports[0].Table.Data[old_index])
+                cls.game_data[file].Exports[0].Table.Data.Insert(new_index, current_entry)
                 #Update the other entry indexes for that same datatable
                 for entry_2 in cls.datatable_entry_index[file]:
                     if new_index < old_index:
@@ -119,23 +119,23 @@ class Data:
                         if new_index >= cls.datatable_entry_index[file][entry_2] > old_index:
                             cls.datatable_entry_index[file][entry_2] -= 1
 
-    @staticmethod
-    def get_export_by_name(filename, export_name):
-        for export in Data.game_data[filename].Exports:
+    @classmethod
+    def get_export_by_name(cls, filename, export_name):
+        for export in cls.game_data[filename].Exports:
             if str(export.ObjectName) == export_name:
                 return export
         raise Exception("Export not found")
 
-    @staticmethod
-    def search_and_replace_string(filename, class_name, data_name, old_value, new_value):
+    @classmethod
+    def search_and_replace_string(cls, filename, class_name, data_name, old_value, new_value):
         """
         Search for a specific piece of data to change in a blueprint file and swap it
         """
-        for export in Data.game_data[filename].Exports:
-            if class_name == str(Data.game_data[filename].Imports[abs(export.ClassIndex.Index) - 1].ObjectName):
+        for export in cls.game_data[filename].Exports:
+            if class_name == str(cls.game_data[filename].Imports[abs(export.ClassIndex.Index) - 1].ObjectName):
                 for data in export.Data:
                     if str(data.Name) == data_name and str(data.Value) == old_value:
-                        data.Value = FName.FromString(Data.game_data[filename], new_value)
+                        data.Value = FName.FromString(cls.game_data[filename], new_value)
 
     @staticmethod
     def copy_asset_import(import_name, source_asset, target_asset):

@@ -90,6 +90,7 @@ class Generate(QThread):
         
         self.progress_bar.setLabelText("Processing data...")
         
+        Data.load_game_data()
         Data.table_complex_to_simple()
         #Manager.debug_output_datatables()
         current += 1
