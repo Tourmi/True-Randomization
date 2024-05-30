@@ -9,12 +9,13 @@ type FileCategories = dict[str, set[str]]
 
 left_side_categories = ["DataTable", "StringTable"]
 
-class ModifiedFilesWidget(QWidget):
+class ModifiedFilesSection(QWidget):
     def __init__(self, file_categories : FileCategories) -> None:
-        super(ModifiedFilesWidget, self).__init__()
+        super().__init__()
         self.modified_files = file_categories
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         left_layout = QVBoxLayout()
         layout.addLayout(left_layout)
         right_layout = QVBoxLayout()
@@ -30,8 +31,8 @@ class ModifiedFilesWidget(QWidget):
             self._label_change(category)
 
     @staticmethod
-    def from_default() -> ModifiedFilesWidget:
-        return ModifiedFilesWidget({
+    def from_default() -> ModifiedFilesSection:
+        return ModifiedFilesSection({
             "DataTable": {
                 "PB_DT_AmmunitionMaster",
                 "PB_DT_ArchiveEnemyMaster",

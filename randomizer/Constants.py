@@ -18,3 +18,5 @@ KEY_ITEMS = [
     "Keyofbacker4",
     "MonarchCrown"
 ]
+
+window_sizes = [720, 900, 1080]

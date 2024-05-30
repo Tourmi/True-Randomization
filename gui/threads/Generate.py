@@ -15,7 +15,7 @@ from randomizer.Constants import MOD_DIR
 from randomizer.Data import Data
 from configuration import Config
 from configuration import ConfigSections
-from .Signaller import Signaller
+from ..widgets.Signaller import Signaller
 
 from PySide6.QtCore import QThread
 from PySide6.QtWidgets import QProgressDialog
@@ -31,11 +31,10 @@ _CHEATS = {
 }
 
 class Generate(QThread):
-    def __init__(self, config : Config, progress_bar : QProgressDialog, selected_seed : str, selected_map, starting_items, owned_dlc):
+    def __init__(self, config : Config, selected_seed : str, selected_map, starting_items, owned_dlc):
         QThread.__init__(self)
         self.config = config
         self.signaller = Signaller()
-        self.progress_bar = progress_bar
         self.selected_seed = selected_seed
         self.selected_map = selected_map
         self.starting_items = starting_items
@@ -48,6 +47,7 @@ class Generate(QThread):
             self.signaller.error.emit(traceback.format_exc())
 
     def process(self):
+        self.signaller.step_changed.emit("Initializing...")
         current = 0
         self.signaller.progress.emit(current)
         
@@ -79,7 +79,7 @@ class Generate(QThread):
         
         #Open files
         
-        self.progress_bar.setLabelText("Loading data...")
+        self.signaller.step_changed.emit("Loading data...")
         
         Data.reload_data()
         
@@ -88,7 +88,7 @@ class Generate(QThread):
         
         #Simplify data
         
-        self.progress_bar.setLabelText("Processing data...")
+        self.signaller.step_changed.emit("Processing data...")
         
         Data.load_game_data()
         Data.table_complex_to_simple()
@@ -96,7 +96,7 @@ class Generate(QThread):
         current += 1
         self.signaller.progress.emit(current)
         
-        self.progress_bar.setLabelText("Editing data...")
+        self.signaller.step_changed.emit("Editing data...")
         
         #Init classes
         
@@ -395,7 +395,7 @@ class Generate(QThread):
         
         #Convert data
         
-        self.progress_bar.setLabelText("Converting data...")
+        self.signaller.step_changed.emit("Converting data...")
         
         Data.table_simple_to_complex()
         Data.update_datatable_order()
@@ -404,7 +404,7 @@ class Generate(QThread):
         
         #Write lip sync
         
-        self.progress_bar.setLabelText("Writing lip sync...")
+        self.signaller.step_changed.emit("Writing lip sync...")
         
         Sound.update_lip_movement()
         current += 1
@@ -412,7 +412,7 @@ class Generate(QThread):
         
         #Write files
         
-        self.progress_bar.setLabelText("Writing files...")
+        self.signaller.step_changed.emit("Writing files...")
         
         Manager.write_files()
         
@@ -498,7 +498,7 @@ class Generate(QThread):
         
         #UnrealPak
         
-        self.progress_bar.setLabelText("Packing files...")
+        self.signaller.step_changed.emit("Packing files...")
         
         with open("Tools\\UnrealPak\\filelist.txt", "w") as file_writer:
             file_writer.write("\"Mod\\*.*\" \"..\\..\\..\\*.*\" \n")
@@ -545,5 +545,5 @@ class Generate(QThread):
         current += 1
         self.signaller.progress.emit(current)
         
-        self.progress_bar.setLabelText("Done")
+        self.signaller.step_changed.emit("Done")
         self.signaller.finished.emit()

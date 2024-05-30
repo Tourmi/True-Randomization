@@ -1,0 +1,2 @@
+from .ArchipelagoDialog import ArchipelagoDialog
+from .SettingsDialog import SettingsDialog

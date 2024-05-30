@@ -8,7 +8,7 @@ from randomizer.Constants import ASSETS_DIR
 from randomizer import Data
 from configuration import Config
 from configuration import ConfigSections
-from .Signaller import Signaller
+from ..widgets.Signaller import Signaller
 
 class Import(QThread):
     def __init__(self, config : Config, asset_list):
@@ -24,6 +24,7 @@ class Import(QThread):
             self.signaller.error.emit(traceback.format_exc())
 
     def process(self):
+        self.signaller.step_changed.emit("Importing assets...")
         current = 0
         self.signaller.progress.emit(current)
         

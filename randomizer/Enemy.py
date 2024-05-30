@@ -370,6 +370,7 @@ class Enemy:
     @classmethod
     def init(cls):
         cls.current_portrait_pos = 0
+        cls.enemy_replacement_invert = {}
 
     @classmethod
     def set_enemy_level_weight(cls, weight : int):

@@ -9,14 +9,13 @@ from PySide6.QtCore import QThread
 
 from randomizer.Constants import SCRIPT_NAME
 from configuration import Config
-from .Signaller import Signaller
+from ..widgets.Signaller import Signaller
 
 class Update(QThread):
-    def __init__(self, config : Config, progress_bar, api):
+    def __init__(self, config : Config, api):
         QThread.__init__(self)
         self.config = config
         self.signaller = Signaller()
-        self.progress_bar = progress_bar
         self.api = api
     
     def run(self):
@@ -26,6 +25,7 @@ class Update(QThread):
             self.signaller.error.emit(traceback.format_exc())
 
     def process(self):
+        self.signaller.step_changed.emit("Downloading...")
         current = 0
         zip_name = "True Randomization.zip"
         exe_name = f"{SCRIPT_NAME}.exe"
@@ -40,7 +40,7 @@ class Update(QThread):
                 current += len(data)
                 self.signaller.progress.emit(current)
         
-        self.progress_bar.setLabelText("Extracting...")
+        self.signaller.step_changed.emit("Extracting...")
         
         #Purge folders
         
