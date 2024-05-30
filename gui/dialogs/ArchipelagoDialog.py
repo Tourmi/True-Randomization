@@ -73,7 +73,6 @@ class ArchipelagoDialog(QDialog):
 
         self.setLayout(archi_window_layout)
         self.setWindowTitle("Archipelago")
-        self.setFixedSize(0, 0)
 
     def archi_apply_button_clicked(self):
         self.config.set(ConfigSections.archipelago.enabled, self.archi_check_box.isChecked())

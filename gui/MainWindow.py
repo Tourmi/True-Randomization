@@ -5,6 +5,7 @@ import traceback
 import psutil
 
 from looseversion import LooseVersion
+from PySide6.QtCore import QSize
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtGui import QIcon
@@ -16,6 +17,7 @@ from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QGraphicsView
 from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QSizePolicy
 
 from randomizer.Constants import *
 
@@ -24,6 +26,7 @@ from configuration import ConfigSections
 from .widgets import MessageBox
 from .widgets import ProgressBar
 from .threads.Update import Update
+from .dialogs import SettingsDialog
 from .sections import ParametersSection
 from .sections import ButtonsSection
 from .sections import ModifiedFilesSection
@@ -36,7 +39,8 @@ class MainWindow(QGraphicsView):
         self.modified_files_widget : ModifiedFilesSection
         self.setEnabled(False)
         self.init()
-        self.check_for_updates()
+        if not self.check_for_updates():
+            self.check_for_resolution()
 
     def init(self):
         self.first_time = False
@@ -78,9 +82,13 @@ class MainWindow(QGraphicsView):
 
         artwork_label = QLabel()
         artwork_label.setStyleSheet("border: 1px solid white")
-        artwork_label.setPixmap(QPixmap("Data\\artwork.png"))
+        artwork = QPixmap("Data\\artwork.png")
+        artwork.scaled(artwork_label.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
+        artwork.setDevicePixelRatio(2 / self.size_multiplier)
+        artwork_label.setPixmap(artwork)
         artwork_label.setScaledContents(True)
-        artwork_label.setFixedSize(int(self.size_multiplier*550), int(self.size_multiplier*978))
+        artwork_label.setBaseSize(int(self.size_multiplier*550), int(self.size_multiplier*978))
+        artwork_label.sizePolicy().setHorizontalStretch(1)
         main_window_layout.addWidget(artwork_label)
         
         #Center widget
@@ -95,7 +103,8 @@ class MainWindow(QGraphicsView):
         
         #Right panel
         right_groupbox = QGroupBox()
-        right_groupbox.setFixedSize(int(self.size_multiplier*550), int(self.size_multiplier*978))
+        right_groupbox.setBaseSize(int(self.size_multiplier*550), int(self.size_multiplier*978))
+        right_groupbox.sizePolicy().setHorizontalStretch(1)
         main_window_layout.addWidget(right_groupbox)
         right_groupbox_layout = QVBoxLayout()
         right_groupbox.setLayout(right_groupbox_layout)
@@ -114,8 +123,7 @@ class MainWindow(QGraphicsView):
         right_groupbox_layout_bottom.addWidget(discord_label)
 
         #Window
-        
-        self.setFixedSize(int(self.size_multiplier*1800), int(self.size_multiplier*1000))
+        self.setBaseSize(int(self.size_multiplier*1800), int(self.size_multiplier*1000))
         self.setWindowIcon(QIcon(self.resource_path("Bloodstained.ico")))
         self.show()
         
@@ -131,7 +139,7 @@ class MainWindow(QGraphicsView):
     def update_finished(self):
         sys.exit()
 
-    def check_for_updates(self):
+    def check_for_updates(self) -> bool:
         if os.path.isfile("delete.me"):
             os.remove("delete.me")
         for index in range(3):
@@ -140,13 +148,11 @@ class MainWindow(QGraphicsView):
         try:
             release_json = requests.get(UPDATE_URL).json()
         except requests.ConnectionError:
-            self.check_for_resolution()
-            return
+            return False
         try:
             tag = LooseVersion(release_json["tag_name"])
         except KeyError:
-            self.check_for_resolution()
-            return
+            return False
         if tag > LooseVersion(self.config.get(ConfigSections.misc.version)):
             choice = QMessageBox.question(self, 
                                           "Auto Updater", 
@@ -155,8 +161,7 @@ class MainWindow(QGraphicsView):
             if choice == QMessageBox.StandardButton.Yes:
                 if "Map Editor.exe" in (program.name() for program in psutil.process_iter()):
                     MessageBox.error(self, "MapEditor.exe is running, cannot overwrite.")
-                    self.check_for_resolution()
-                    return
+                    return False
                 
                 self.progress_bar = ProgressBar(0, release_json["assets"][0]["size"], self, "Status")
                 self.worker = Update(self.config, release_json)
@@ -164,16 +169,15 @@ class MainWindow(QGraphicsView):
                 self.progress_bar.setAutoClose(False)
                 self.progress_bar.setAutoReset(False)
                 self.worker.signaller.finished.connect(self.update_finished)
+                self.progress_bar.show()
                 self.worker.start()
-            else:
-                self.check_for_resolution()
-        else:
-            self.check_for_resolution()
+                return True
+        return False
     
     def check_for_resolution(self):
         if self.first_time:
-            pass
-            #self.setting_button_clicked()
+            setting_window = SettingsDialog(self, self.config)
+            setting_window.exec()
         self.setEnabled(True)
     
     def exception_hook(self, exc_type, exc_value, exc_traceback):

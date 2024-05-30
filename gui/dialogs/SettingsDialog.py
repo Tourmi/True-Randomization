@@ -26,13 +26,12 @@ from configuration import ConfigSections
 from randomizer.Constants import *
 
 class SettingsDialog(QDialog):
-    def __init__(self, parent, config, size_multiplier):
+    def __init__(self, parent, config):
         super().__init__(parent)
         self.config = config
-        self.size_multiplier = size_multiplier
 
         self.setWindowTitle("Settings")
-        self.setFixedSize(0, 0)
+
         #Settings
         layout = QVBoxLayout()
         self.setLayout(layout)

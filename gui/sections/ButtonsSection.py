@@ -112,9 +112,8 @@ class ButtonsSection(QWidget):
         self.dlc_check_box.setChecked(self.config.getboolean(ConfigSections.misc.ignore_dlc))
 
     def setting_button_clicked(self):
-        setting_window = SettingsDialog(self.parentWidget(), self.config, self.size_multiplier)
+        setting_window = SettingsDialog(self.parentWidget(), self.config)
         setting_window.exec()
-    
     
     def import_asset_button_clicked(self):
         #Check if path is valid
@@ -232,7 +231,7 @@ class ButtonsSection(QWidget):
         
         self.import_assets(asset_list, self.generate_pak) if asset_list else self.generate_pak()
     
-    def import_assets(self, asset_list, finished):
+    def import_assets(self, asset_list : list[str], finished):
         self.parentWidget().setEnabled(False)
         QApplication.processEvents()
         
@@ -240,6 +239,7 @@ class ButtonsSection(QWidget):
         self.progress_bar = ProgressBar(0, len(asset_list), self.parentWidget(), "Status")
         self.progress_bar.connect_to(self.worker.signaller)
         self.worker.signaller.finished.connect(finished)
+        self.progress_bar.show()
         self.worker.start()
 
     def import_finished(self):
@@ -256,6 +256,7 @@ class ButtonsSection(QWidget):
         self.progress_bar.connect_to(self.worker.signaller)
 
         self.worker.signaller.finished.connect(self.generate_finished)
+        self.progress_bar.show()
         self.worker.start()
     
     def generate_finished(self):
